@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1, h2, h3 {
+    color: #333;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #007BFF;
+}
+<style>
+    .metric-card {
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .metric-card h5 {
+        font-size: 1.2rem;
+    }
+    .metric-card h3 {
+        font-size: 2rem;
+        color: white; /* Ensure text remains white */
+    }
+</style>
