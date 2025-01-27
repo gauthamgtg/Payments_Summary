@@ -304,9 +304,23 @@ def transactions():
     records_per_page = int(request.form.get("records_per_page", 10)) if request.method == 'POST' else 10
     page = int(request.args.get("page", 1))
 
+    # Default filter values
+    status_filter = []
+    source_filter = []
+    captured_filter = "All"
+    adspends_filter = "All"
+    date_range_start = None
+    date_range_end = None
+    search_term = None
+
+    # Extract unique filter options
+    status_options = data["Status"].dropna().unique().tolist()
+    source_options = data["Source"].dropna().unique().tolist()
+    captured_options = [True, False]  # Captured values are usually boolean
+
     if request.method == 'POST':
         status_filter = request.form.getlist('status')
-        source_filter = request.form.getlist('Source')
+        source_filter = request.form.getlist('source')
         captured_filter = request.form.get('captured')
         adspends_filter = request.form.get('adspends')
         date_range_start = request.form.get('date_start')
@@ -359,7 +373,14 @@ def transactions():
         total_pages=total_pages,
         total_records=total_records,
         records_per_page=records_per_page,
+        status_options=status_options,
+        source_options=source_options,
+        captured_options=captured_options,
+        selected_status=status_filter,
+        selected_source=source_filter,
+        selected_captured=captured_filter,
     )
+
 
 
 @app.route('/refunds')

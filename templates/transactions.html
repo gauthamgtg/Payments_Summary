@@ -32,44 +32,59 @@
 <main class="container my-5">
 <h1 class="text-center mb-4">Transactions</h1>
 <form class="filter-form mb-4" method="post">
-<div class="row g-3 align-items-center">
-<div class="col-md-3">
-<label class="form-label" for="status">Status:</label>
-<select class="form-select" id="status" multiple="" name="status">
-<option value="Paid">Paid</option>
-<option value="Failed">Failed</option>
-</select>
-</div>
-<div class="col-md-3">
-<label class="form-label" for="captured">Captured:</label>
-<select class="form-select" id="captured" name="captured">
-<option value="All">All</option>
-<option value="Yes">Yes</option>
-<option value="No">No</option>
-</select>
-</div>
-<div class="col-md-3">
-<label class="form-label" for="source">Source:</label>
-<select class="form-select" id="source" name="source">
-<option value="All">All</option>
-<option value="Stripe">Stripe</option>
-<option value="Mercury">Mercury</option>
-</select>
-</div>
-<div class="col-md-3 text-end">
-<label class="form-label" for="records-per-page">Records per page:</label>
-<select class="form-select" id="records-per-page" name="records_per_page">
-<option value="10">10</option>
-<option value="25">25</option>
-<option value="50">50</option>
-<option value="100">100</option>
-</select>
-</div>
-<div class="col-md-auto">
-<button class="btn btn-primary" type="submit">Filter</button>
-</div>
-</div>
+    <div class="row g-3 align-items-center">
+        <!-- Status Filter -->
+        <div class="col-md-3">
+            <label class="form-label" for="status">Status:</label>
+            <select class="form-select" id="status" multiple name="status">
+                {% for status in status_options %}
+                    <option value="{{ status }}" {% if status in selected_status %}selected{% endif %}>
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Source Filter -->
+        <div class="col-md-3">
+            <label class="form-label" for="source">Source:</label>
+            <select class="form-select" id="source" name="source" multiple>
+                {% for source in source_options %}
+                    <option value="{{ source }}" {% if source in selected_source %}selected{% endif %}>
+                        {{ source }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Captured Filter -->
+        <div class="col-md-3">
+            <label class="form-label" for="captured">Captured:</label>
+            <select class="form-select" id="captured" name="captured">
+                <option value="All" {% if selected_captured == "All" %}selected{% endif %}>All</option>
+                <option value="Yes" {% if selected_captured == "Yes" %}selected{% endif %}>Yes</option>
+                <option value="No" {% if selected_captured == "No" %}selected{% endif %}>No</option>
+            </select>
+        </div>
+
+        <!-- Records per Page -->
+        <div class="col-md-3 text-end">
+            <label class="form-label" for="records-per-page">Records per page:</label>
+            <select class="form-select" id="records-per-page" name="records_per_page">
+                <option value="10" {% if records_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="25" {% if records_per_page == 25 %}selected{% endif %}>25</option>
+                <option value="50" {% if records_per_page == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if records_per_page == 100 %}selected{% endif %}>100</option>
+            </select>
+        </div>
+
+        <!-- Filter Button -->
+        <div class="col-md-auto">
+            <button class="btn btn-primary" type="submit">Filter</button>
+        </div>
+    </div>
 </form>
+
 <h2 class="mb-3">Transaction Data</h2>
 <div class="table-responsive">
     <table class="table table-bordered table-hover table-striped align-middle">
