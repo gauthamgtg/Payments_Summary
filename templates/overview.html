@@ -1,184 +1,141 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overview</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/styles.css">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        h1, h4 {
-            color: #343a40;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .chart-container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-        .metric-card {
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .metric-card h5 {
-            font-size: 1.2rem;
-        }
-        .metric-card h3 {
-    font-size: 2rem;
-    color: white; /* Text color changed to white */
-        }
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Overview</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/static/styles.css" rel="stylesheet"/>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-    </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Payments Dashboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/overview">Overview</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a></li>
-                </ul>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container my-5">
-        <!-- Title -->
-        <h1 class="text-center mb-4">Payments Overview</h1>
-
-        <!-- Metrics Section -->
-        <div class="row g-4 text-center">
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Payment Value</h5>
-                    <h3>${{ "{:,.2f}".format(total_payment_value) }}</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Successful Payments</h5>
-                    <h3>${{ "{:,.2f}".format(total_success) }}</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Failed Payments</h5>
-                    <h3>${{ "{:,.2f}".format(total_failed) }}</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Gateway Charges</h5>
-                    <h3>${{ "{:,.2f}".format(total_gateway_charge) }}</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Fee</h5>
-                    <h3>${{ "{:,.2f}".format(total_fee) }}</h3>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card metric-card p-3">
-                    <h5>Total Refunded Amount</h5>
-                    <h3>${{ "{:,.2f}".format(total_refunded) }}</h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pie Charts Section -->
-        <div class="row mt-5">
-            <div class="col-md-6 chart-container">
-                <h4 class="text-center">Success vs Failed vs Refunded (Count)</h4>
-                <div>{{ pie_chart_count | safe }}</div>
-            </div>
-            <div class="col-md-6 chart-container">
-                <h4 class="text-center">Success vs Failed vs Refunded (Amount)</h4>
-                <div>{{ pie_chart_amount | safe }}</div>
-            </div>
-        </div>
-
-        <!-- Line Chart: Monthly Revenue -->
-        <div class="row mt-5">
-            <div class="col-12 chart-container">
-                <h4 class="text-center">Monthly Revenue</h4>
-                <div>{{ revenue_chart | safe }}</div>
-            </div>
-        </div>
-
-        <!-- Stacked Bar Chart -->
-        <div class="row mt-5">
-            <div class="col-12 chart-container">
-                <h4 class="text-center">Monthly Payment Breakdown (Refunded, Successful, Failed)</h4>
-                <div>{{ stacked_bar_chart | safe }}</div>
-            </div>
-        </div>
-
-        <!-- 100% Stacked Bar Chart -->
-        <div class="row mt-5">
-            <div class="col-12 chart-container">
-                <h4 class="text-center">Monthly Payment Breakdown (100% Stacked)</h4>
-                <div>{{ normalized_chart | safe }}</div>
-            </div>
-        </div>
-
-        <!-- Adspends and Subscriptions -->
-        <div class="row mt-5">
-            <div class="col-md-6 chart-container">
-                <h4 class="text-center">Adspends Monthly Breakdown</h4>
-                <div>{{ adspends_chart | safe }}</div>
-            </div>
-            <div class="col-md-6 chart-container">
-                <h4 class="text-center">Subscriptions Monthly Breakdown</h4>
-                <div>{{ subscription_chart | safe }}</div>
-            </div>
-        </div>
-
-        <!-- Payments by Country -->
-        <div class="row mt-5">
-            <div class="col-12 chart-container">
-                <h4 class="text-center">Payments by Card Address Country</h4>
-                <div>{{ country_chart | safe }}</div>
-            </div>
-        </div>
-
-        <!-- Failed Payments Reason Analysis -->
-        <div class="row mt-5">
-            <div class="col-12 chart-container">
-                <h4 class="text-center">Failed Payments Reason Analysis</h4>
-                <div>{{ failed_reason_chart | safe }}</div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3">
-        <p>&copy; 2025 Payments Dashboard. All rights reserved.</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Navigation Bar -->
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+<div class="container-fluid">
+<a class="navbar-brand" href="/">Payments Dashboard</a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+<li class="nav-item"><a class="nav-link active" href="/overview">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
+<li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+<li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
+<li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
+<li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a></li>
+</ul>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="container my-5">
+<!-- Title -->
+<h1 class="text-center mb-4">Payments Overview</h1>
+<!-- Metrics Section -->
+<div class="row g-4 text-center">
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Payment Value</h5>
+<h3>${{ "{:,.2f}".format(total_payment_value) }}</h3>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Successful Payments</h5>
+<h3>${{ "{:,.2f}".format(total_success) }}</h3>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Failed Payments</h5>
+<h3>${{ "{:,.2f}".format(total_failed) }}</h3>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Disputed Amount</h5>
+<h3>${{ "{:,.2f}".format(total_disputed_amount) }}</h3>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Fee</h5>
+<h3>${{ "{:,.2f}".format(total_fee) }}</h3>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card metric-card p-3">
+<h5>Total Refunded Amount</h5>
+<h3>${{ "{:,.2f}".format(total_refunded) }}</h3>
+</div>
+</div>
+</div>
+<!-- Pie Charts Section -->
+<div class="row mt-5">
+<div class="col-md-6 chart-container">
+<h4 class="text-center">Success vs Failed vs Refunded (Count)</h4>
+<div>{{ pie_chart_count | safe }}</div>
+</div>
+<div class="col-md-6 chart-container">
+<h4 class="text-center">Success vs Failed vs Refunded (Amount)</h4>
+<div>{{ pie_chart_amount | safe }}</div>
+</div>
+</div>
+<!-- Line Chart: Monthly Revenue -->
+<div class="row mt-5">
+<div class="col-12 chart-container">
+<h4 class="text-center">Monthly Revenue</h4>
+<div>{{ revenue_chart | safe }}</div>
+</div>
+</div>
+<!-- Stacked Bar Chart -->
+<div class="row mt-5">
+<div class="col-12 chart-container">
+<h4 class="text-center">Monthly Payment Breakdown (Refunded, Successful, Failed)</h4>
+<div>{{ stacked_bar_chart | safe }}</div>
+</div>
+</div>
+<!-- 100% Stacked Bar Chart -->
+<div class="row mt-5">
+<div class="col-12 chart-container">
+<h4 class="text-center">Monthly Payment Breakdown (100% Stacked)</h4>
+<div>{{ normalized_chart | safe }}</div>
+</div>
+</div>
+<!-- Adspends and Subscriptions -->
+<div class="row mt-5">
+<div class="col-md-6 chart-container">
+<h4 class="text-center">Adspends Monthly Breakdown</h4>
+<div>{{ adspends_chart | safe }}</div>
+</div>
+<div class="col-md-6 chart-container">
+<h4 class="text-center">Subscriptions Monthly Breakdown</h4>
+<div>{{ subscription_chart | safe }}</div>
+</div>
+</div>
+<!-- Payments by Country -->
+<div class="row mt-5">
+<div class="col-12 chart-container">
+<h4 class="text-center">Payments by Card Address Country</h4>
+<div>{{ country_chart | safe }}</div>
+</div>
+</div>
+<!-- Failed Payments Reason Analysis -->
+<div class="row mt-5">
+<div class="col-12 chart-container">
+<h4 class="text-center">Failed Payments Reason Analysis</h4>
+<div>{{ failed_reason_chart | safe }}</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-3">
+<p>© 2025 Payments Dashboard. All rights reserved.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

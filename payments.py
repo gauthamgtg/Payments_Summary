@@ -28,7 +28,8 @@ def load_and_process_data():
         "requires_confirmation": "Failed",
         "requires_action": "Failed",
         "Paid": "Paid",
-        "Refunded": "Refunded"
+        "Refunded": "Refunded",
+        "Partial Refund": "Partial Refund"
     }
     df["Status"] = df["Status"].map(status_mapping)
 
@@ -91,9 +92,9 @@ def overview():
     total_payment_value = data["Converted Amount"].sum()
     total_success = data[data["Status"] == "Paid"]["Converted Amount"].sum()
     total_failed = data[(data["Status"] != "Paid") & (data["Status"] != "Refunded")]["Converted Amount"].sum()
-    total_gateway_charge = data["Gateway charges in USD"].sum()
+    total_disputed_amount = data["Disputed Amount"].sum()
     total_fee = data["Fee"].sum()
-    total_refunded = data[data["Status"] == "Refunded"]["Converted Amount Refunded"].sum()
+    total_refunded = data["Converted Amount Refunded"].sum()
 
     # Success vs Failed vs Refunded Pie Charts
     status_counts = data["Status"].value_counts()
@@ -140,7 +141,7 @@ def overview():
     # Monthly Payment Breakdown (Refunded, Successful, Failed)
     monthly_summary = data.groupby("Month").agg(
         Total_Payments=("Converted Amount", "sum"),
-        Total_Refunded=("Converted Amount Refunded", lambda x: x[data.loc[x.index, "Status"] == "Refunded"].sum()),
+        Total_Refunded=("Converted Amount Refunded","sum"),
         Total_Successful=("Converted Amount", lambda x: x[data.loc[x.index, "Status"] == "Paid"].sum()),
         Total_Failed=("Converted Amount", lambda x: x[data.loc[x.index, "Status"].isin(["Failed", "Other_Failed_Status"])].sum())
     ).reset_index()
@@ -187,7 +188,7 @@ def overview():
     )
 
     # Failed Payments Reason Analysis
-    failed_reasons = data[(data["Status"] != "Paid") & (data["Status"] != "Refunded")]["Decline Reason"].value_counts().reset_index()
+    failed_reasons = data[(data["Status"] != "Paid") & (data["Status"] != "Refunded")& (data["Status"] != "Partial Refund")]["Decline Reason"].value_counts().reset_index()
     failed_reasons.columns = ["Decline Reason", "Count"]
     failed_reason_chart = px.bar(
         failed_reasons,
@@ -201,7 +202,7 @@ def overview():
         total_payment_value=total_payment_value,
         total_success=total_success,
         total_failed=total_failed,
-        total_gateway_charge=total_gateway_charge,
+        total_disputed_amount=total_disputed_amount,
         total_fee=total_fee,
         total_refunded=total_refunded,
         pie_chart_count=pie_chart_count.to_html(full_html=False),
@@ -225,7 +226,7 @@ def generate_category_chart(data, category):
         "Converted Amount Refunded": "sum"
     }).rename(columns={"Converted Amount": "Total Payment", "Status": "Successful Payments"})
     category_summary["Failed Payments"] = category_data[
-        (category_data["Status"] != "Paid") & (category_data["Status"] != "Refunded")
+        (category_data["Status"] != "Paid") & (category_data["Status"] != "Refunded") & (data["Status"] != "Partial Refund")
     ].groupby("Month")["Converted Amount"].sum()
     category_summary = category_summary.reset_index()
     return px.bar(
@@ -264,7 +265,7 @@ def customer_metrics():
                 'total_successful_payments': customer_data[customer_data['Status'] == 'Paid']['Converted Amount'].sum(),
                 'total_adspend_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Adspends') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum(),
                 'total_subscription_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Subscription') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum(),
-                'total_refunds': customer_data['Amount Refunded'].sum(),
+                'total_refunds': customer_data['Converted Amount Refunded'].sum(),
                 'total_disputes': customer_data['Disputed Amount'].sum(),
                 'total_subscription': customer_data[customer_data['Adspends / Subscription'] == 'Subscription']['Converted Amount'].sum(),
                 'total_adspends': customer_data[customer_data['Adspends / Subscription'] == 'Adspends']['Converted Amount'].sum()
@@ -305,6 +306,7 @@ def transactions():
 
     if request.method == 'POST':
         status_filter = request.form.getlist('status')
+        source_filter = request.form.getlist('Source')
         captured_filter = request.form.get('captured')
         adspends_filter = request.form.get('adspends')
         date_range_start = request.form.get('date_start')
@@ -314,6 +316,8 @@ def transactions():
         # Apply filters
         if status_filter:
             filtered_data = filtered_data[filtered_data["Status"].isin(status_filter)]
+        if source_filter:
+            filtered_data = filtered_data[filtered_data["Source"].isin(source_filter)]
         if captured_filter == "Yes":
             filtered_data = filtered_data[filtered_data["Captured"] == True]
         elif captured_filter == "No":
@@ -341,9 +345,15 @@ def transactions():
     # Generate pagination structure
     pagination = generate_pagination(page, total_pages)
 
+    # Prepare data for the template
+    transactions_data = {
+        "columns": list(filtered_data.columns),
+        "data": paginated_data.values.tolist(),
+    }
+
     return render_template(
         'transactions.html',
-        transactions_data=paginated_data.to_html(index=False, classes="table table-striped table-hover"),
+        transactions_data=transactions_data,
         pagination=pagination,
         current_page=page,
         total_pages=total_pages,
@@ -354,13 +364,13 @@ def transactions():
 
 @app.route('/refunds')
 def refunds():
-    total_refunded_amount = data["Amount Refunded"].sum()
-    total_refunds = data[data["Amount Refunded"] > 0].shape[0]
-    refund_trends = data[data["Amount Refunded"] > 0].groupby("Created date")["Amount Refunded"].sum().reset_index()
+    total_refunded_amount = data["Converted Amount Refunded"].sum()
+    total_refunds = data[data["Converted Amount Refunded"] > 0].shape[0]
+    refund_trends = data[data["Converted Amount Refunded"] > 0].groupby("Created date")["Converted Amount Refunded"].sum().reset_index()
     refund_chart = px.line(
         refund_trends,
         x="Created date",
-        y="Amount Refunded",
+        y="Converted Amount Refunded",
         title="Refund Trends Over Time"
     )
     return render_template(
@@ -397,7 +407,7 @@ def disputes():
 def adspends_vs_subscriptions():
     category_summary = data.groupby("Adspends / Subscription").agg({
         "Amount": "sum",
-        "Amount Refunded": "sum",
+        "Converted Amount Refunded": "sum",
         "Gateway charges in USD": "sum"
     }).reset_index()
     revenue_trends = data.groupby(["Adspends / Subscription", "Created date"]).agg({"Amount": "sum"}).reset_index()

@@ -1,60 +1,62 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/styles.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/static/styles.css" rel="stylesheet"/>
 </head>
 <body>
-    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Payments Dashboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/overview">Overview</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a></li>
-                </ul>
-            </div>
-        </div>
-    </header>
-    <main class="container text-center my-5">
-        <h1 class="display-4">Welcome to the Payments Dashboard</h1>
-        <p class="lead">Explore payment metrics, customer data, transactions, refunds, disputes, and more.</p>
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <a href="/overview" class="btn btn-primary btn-lg w-100">Overview</a>
-            </div>
-            <div class="col-md-4">
-                <a href="/customer-metrics" class="btn btn-secondary btn-lg w-100">Customer Metrics</a>
-            </div>
-            <div class="col-md-4">
-                <a href="/transactions" class="btn btn-success btn-lg w-100">Transactions</a>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-4">
-                <a href="/refunds" class="btn btn-danger btn-lg w-100">Refunds</a>
-            </div>
-            <div class="col-md-4">
-                <a href="/disputes" class="btn btn-warning btn-lg w-100">Disputes</a>
-            </div>
-            <div class="col-md-4">
-                <a href="/adspends-vs-subscriptions" class="btn btn-info btn-lg w-100">Adspends vs Subscriptions</a>
-            </div>
-        </div>
-    </main>
-    <footer class="bg-dark text-white text-center py-3">
-        <p>&copy; 2025 Payments Dashboard. All rights reserved.</p>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<header class="navbar navbar-expand-lg navbar-dark bg-dark">
+<div class="container-fluid">
+<a class="navbar-brand" href="/">Payments Dashboard</a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav ms-auto">
+<li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="/overview">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
+<li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+<li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
+<li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
+<li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a></li>
+</ul>
+</div>
+</div>
+</header>
+<main class="container text-center my-5">
+<h1 class="display-4">Welcome to the Payments Dashboard</h1>
+<p class="lead">Explore payment metrics, customer data, transactions, refunds, disputes, and more.</p>
+<div class="row mt-4">
+<div class="col-md-4">
+<a class="btn btn-primary btn-lg w-100" href="/overview">Overview</a>
+</div>
+<div class="col-md-4">
+<a class="btn btn-secondary btn-lg w-100" href="/customer-metrics">Customer Metrics</a>
+</div>
+<div class="col-md-4">
+<a class="btn btn-success btn-lg w-100" href="/transactions">Transactions</a>
+</div>
+</div>
+<div class="row mt-3">
+<div class="col-md-4">
+<a class="btn btn-danger btn-lg w-100" href="/refunds">Refunds</a>
+</div>
+<div class="col-md-4">
+<a class="btn btn-warning btn-lg w-100" href="/disputes">Disputes</a>
+</div>
+<div class="col-md-4">
+<a class="btn btn-info btn-lg w-100" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a>
+</div>
+</div>
+</main>
+<footer class="bg-dark text-white text-center py-3">
+<p>© 2025 Payments Dashboard. All rights reserved.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

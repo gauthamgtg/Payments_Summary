@@ -37,3 +37,212 @@ nav ul li a {
         color: white; /* Ensure text remains white */
     }
 </style>
+
+/* Extracted Inline Styles */
+/* Styles for summary and chart container */
+        .summary-container {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-container h2 {
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 10px;
+            color: #6c757d;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td, th {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+    
+
+    .metric-card {
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .metric-card h5 {
+        font-size: 1.2rem;
+    }
+    .metric-card h3 {
+        font-size: 2rem;
+        color: white; /* Ensure text remains white */
+    }
+
+
+        /* Custom styles for stat cards and chart container */
+        .stat-card {
+            background-color: #ff6f61; /* Redish tone for disputes */
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-card h5 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+    
+
+        body {
+            background-color: #f8f9fa;
+        }
+        h1, h4 {
+            color: #343a40;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .metric-card {
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .metric-card h5 {
+            font-size: 1.2rem;
+        }
+        .metric-card h3 {
+    font-size: 2rem;
+    color: white; /* Text color changed to white */
+        }
+
+    
+
+        /* Custom chart container styles */
+        .chart-container {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-card h5 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    
+
+        /* Custom table styles */
+        table {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        th {
+            background-color: #007bff; /* Blue background */
+            color: white; /* White text */
+            text-align: center;
+        }
+        td, th {
+            padding: 12px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pagination a {
+            color: #007bff;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            margin: 0 4px;
+            border-radius: 5px;
+        }
+
+        .pagination a.active {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+
+        /* Filter form spacing */
+        .filter-form .form-control {
+            margin-bottom: 10px;
+        }
