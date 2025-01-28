@@ -3,36 +3,21 @@ name: Deploy to PythonAnywhere
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on pushes to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
+      # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      # Step 3: Install Dependencies
-      - name: Install Dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          # Add Python's user base `bin` directory to PATH
-          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
-
-      # Step 5: Deploy to PythonAnywhere
-      - name: Deploy to PythonAnywhere
+      # Step 2: Deploy to PythonAnywhere
+      - name: Deploy Code to PythonAnywhere
         env:
           PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
         run: |
-          pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && git pull || git clone https://github.com/gauthamgtg/Payments_Summary.git ~/payments_summary/Payments_Summary"
-          pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && pip install -r requirements.txt"
-          pythonanywhere reload gauthamgtg.pythonanywhere.com
+          curl -X POST https://www.pythonanywhere.com/api/v0/user/gauthamgtg/webapps/gauthamgtg.pythonanywhere.com/reload/ \
+          -H "Authorization: Token $PA_API_TOKEN"
