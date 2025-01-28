@@ -28,10 +28,6 @@ jobs:
           # Add Python's user base `bin` directory to PATH
           echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
 
-      # Step 4: Verify PythonAnywhere Installation
-      - name: Verify PythonAnywhere Installation
-        run: pythonanywhere --version
-
       # Step 5: Deploy to PythonAnywhere
       - name: Deploy to PythonAnywhere
         env:
