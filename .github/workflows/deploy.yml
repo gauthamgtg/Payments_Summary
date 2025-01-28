@@ -18,18 +18,20 @@ jobs:
       - name: Set Up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'  # Adjust if you're using a different Python version
+          python-version: '3.10'
 
       # Step 3: Install PythonAnywhere CLI
       - name: Install PythonAnywhere CLI
-        run: pip install pythonanywhere
+        run: |
+          pip install --upgrade pip
+          pip install pythonanywhere
 
       # Step 4: Deploy to PythonAnywhere
       - name: Deploy to PythonAnywhere
         env:
           PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
         run: |
-          # Use the PythonAnywhere API to run deployment commands
+          # Use the PythonAnywhere CLI to run deployment commands
           pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && git pull || git clone https://github.com/gauthamgtg/Payments_Summary.git ~/payments_summary/Payments_Summary"
           pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && pip install -r requirements.txt"
           pythonanywhere reload gauthamgtg.pythonanywhere.com
