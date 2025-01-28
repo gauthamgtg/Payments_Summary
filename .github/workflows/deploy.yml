@@ -29,18 +29,7 @@ jobs:
         env:
           PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
         run: |
-          # Ensure the parent directory exists
-          mkdir -p /home/gauthamgtg/payments_summary
-
-          # Clone the repository if it doesn't exist, otherwise pull updates
-          if [ -d "/home/gauthamgtg/payments_summary/Payments_Summary" ]; then
-              cd /home/gauthamgtg/payments_summary/Payments_Summary
-              git pull
-          else
-              git clone https://github.com/gauthamgtg/Payments_Summary.git /home/gauthamgtg/payments_summary/Payments_Summary
-          fi
-
-          # Change directory, install dependencies, and reload PythonAnywhere
-          cd /home/gauthamgtg/payments_summary/Payments_Summary
-          pip install -r requirements.txt
+          # Use the PythonAnywhere API to run deployment commands
+          pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && git pull || git clone https://github.com/gauthamgtg/Payments_Summary.git ~/payments_summary/Payments_Summary"
+          pythonanywhere ssh "cd ~/payments_summary/Payments_Summary && pip install -r requirements.txt"
           pythonanywhere reload gauthamgtg.pythonanywhere.com
