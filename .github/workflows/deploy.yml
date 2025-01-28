@@ -25,6 +25,8 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          # Add Python's user base `bin` directory to PATH
+          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
 
       # Step 4: Verify PythonAnywhere Installation
       - name: Verify PythonAnywhere Installation
