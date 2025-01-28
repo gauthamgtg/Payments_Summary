@@ -19,7 +19,7 @@ jobs:
         env:
           PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
         run: |
-          ssh gauthamgtg@ssh.pythonanywhere.com << EOF
+          ssh -o StrictHostKeyChecking=no gauthamgtg@ssh.pythonanywhere.com << EOF
           cd ~/payments_summary/Payments_Summary || git clone https://github.com/gauthamgtg/Payments_Summary.git ~/payments_summary/Payments_Summary
           cd ~/payments_summary/Payments_Summary
           git pull
