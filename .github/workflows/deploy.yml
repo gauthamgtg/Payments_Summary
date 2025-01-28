@@ -16,7 +16,7 @@ jobs:
 
       # Step 2: Set up SSH Key
       - name: Add SSH Key
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
 
