@@ -35,6 +35,17 @@
 <main class="container my-5">
 <!-- Title -->
 <h1 class="text-center mb-4">Payments Overview</h1>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <label for="sourceFilter" class="form-label">Filter by Source:</label>
+        <select id="sourceFilter" class="form-select">
+            <option value="All" {% if selected_source == "All" %}selected{% endif %}>All</option>
+            {% for source in unique_sources %}
+                <option value="{{ source }}" {% if selected_source == source %}selected{% endif %}>{{ source }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
 <!-- Metrics Section -->
 <div class="row g-4 text-center">
 <div class="col-md-4">
@@ -131,11 +142,99 @@
 <div>{{ failed_reason_chart | safe }}</div>
 </div>
 </div>
-</main>
+
+<!-- Cohorts -->
+<h2>Customer Cohort Table</h2>
+<div id="cohortContainer">
+    <!-- This div will be replaced dynamically with a message or the table -->
+</div>
+
+<h2>Retention Rate Table</h2>
+<div id="retentionContainer">
+    <!-- This div will be replaced dynamically with a message or the table -->
+</div>
+
+<script>
+    // Data for cohort and retention tables passed from Flask
+    const cohortData = {{ cohort_data | tojson }};
+    const retentionData = {{ retention_data | tojson }};
+
+    // Helper function to calculate color based on value
+    function getColor(value, minValue, maxValue) {
+        if (value === 0) {
+            return "#f0f0f0"; // Light grey for zero values
+        }
+
+        const ratio = (value - minValue) / (maxValue - minValue);
+        const lightness = 90 - ratio * 50; // Ranges from 50% (dark blue) to 100% (light blue)
+
+        return `hsl(240, 100%, ${lightness}%)`;
+    }
+
+    // Function to render a table with row-wise color scaling
+    function renderTable(data, containerId, tableId) {
+        const container = document.getElementById(containerId);
+
+        // Handle empty or invalid data
+        if (!data || Object.keys(data).length === 0) {
+            container.innerHTML = `<p class="text-warning">No data available for this table.</p>`;
+            return;
+        }
+
+        // Create table
+        const table = document.createElement('table');
+        table.id = tableId;
+        table.className = 'table table-bordered table-hover table-striped align-middle';
+
+        const keys = Object.keys(data); // Cohort periods (rows)
+        const periods = Object.keys(data[keys[0]]); // Period numbers (columns)
+
+        // Create table header
+        let headerRow = '<tr><th>Cohort</th>';
+        periods.forEach(period => {
+            headerRow += `<th>Month ${period}</th>`;
+        });
+        headerRow += '</tr>';
+        table.innerHTML += headerRow;
+
+        // Create table body with color scale per row
+        keys.forEach(cohort => {
+            const rowData = data[cohort]; // Data for the current row
+
+            // Calculate min and max values for each row to scale colors per row
+            const rowValues = Object.values(rowData);
+            const minValue = Math.min(...rowValues);
+            const maxValue = Math.max(...rowValues);
+
+            let row = `<tr><td>${cohort}</td>`;
+            periods.forEach(period => {
+                const value = rowData[period] || 0;
+                const color = getColor(value, minValue, maxValue);
+                row += `<td style="background-color: ${color};">${value}</td>`;
+            });
+            row += '</tr>';
+            table.innerHTML += row;
+        });
+
+        // Append the table to the container
+        container.appendChild(table);
+    }
+
+    // Render cohort and retention tables
+    renderTable(cohortData, 'cohortContainer', 'cohortTable');
+    renderTable(retentionData, 'retentionContainer', 'retentionTable');
+</script>
+
+
 <!-- Footer -->
 <footer class="bg-dark text-white text-center py-3">
 <p>© 2025 Payments Dashboard. All rights reserved.</p>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('sourceFilter').addEventListener('change', function () {
+        const selectedSource = this.value;
+        window.location.href = `/overview?source=${encodeURIComponent(selectedSource)}`;
+    });
+</script>
 </body>
 </html>
