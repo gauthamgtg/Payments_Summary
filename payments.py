@@ -7,6 +7,7 @@ import io
 import matplotlib.pyplot as plt
 import seaborn as sns
 from operator import attrgetter
+import os
 
 app = Flask(__name__)
 
@@ -484,5 +485,8 @@ def export_csv():
     csv_buffer.seek(0)
     return send_file(io.BytesIO(csv_buffer.getvalue().encode()), mimetype="text/csv", as_attachment=True, attachment_filename="filtered_data.csv")
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+if __name__ == "__main__":
+    # Set default port to 5000 for local development
+    port = int(os.environ.get("PORT", 5000))  
+    app.run(host="0.0.0.0" if os.environ.get("RENDER") else "127.0.0.1", port=port, debug=True)
