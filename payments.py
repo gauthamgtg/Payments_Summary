@@ -90,27 +90,43 @@ def generate_category_chart(data, category):
         x="Month",
         y="Amount",
         color="Type",
-        title=f"{category} Monthly Payment Breakdown",
         barmode="group"
     )
 
-def generate_pie_chart(data, column, title):
-    counts = data[column].value_counts()
-    return px.pie(
-        names=counts.index,
-        values=counts.values,
-        title=title
-    )
+def generate_pie_chart(data, names_column, values_column, title):
+    if title is None:
+         return px.pie(
+                            data,
+                            names=names_column,
+                            values=values_column)
+    else:
+        return px.pie(
+            data,
+            names=names_column,
+            values=values_column,
+            title=title
+        )
+
 
 def generate_line_chart(data, x, y, title, labels):
-    chart = px.line(
+    if title is None:
+        chart = px.line(
         data,
         x=x,
         y=y,
-        title=title,
         markers=True,
         labels=labels
-    )
+             )
+    else:
+        chart = px.line(
+            data,
+            x=x,
+            y=y,
+            title=title,
+            markers=True,
+            labels=labels
+        )
+
     for i, row in data.iterrows():
         chart.add_annotation(
             x=row[x],
@@ -161,8 +177,7 @@ def index():
 
 @app.route('/overview')
 def overview():
-   
-   # Get unique sources for the filter dropdown
+    # Get unique sources for the filter dropdown
     unique_sources = data['Source'].dropna().unique().tolist()
     unique_sources.sort()  # Sort the sources alphabetically
 
@@ -178,27 +193,40 @@ def overview():
     # Calculate metrics
     total_payment_value = filtered_data["Converted Amount"].sum()
     total_success = filtered_data[filtered_data["Status"] == "Paid"]["Converted Amount"].sum()
-    total_failed = filtered_data[(filtered_data["Status"] != "Paid") & (filtered_data["Status"] != "Refunded") & (filtered_data["Status"] != "Partial Refund")]["Converted Amount"].sum()
+    total_failed = filtered_data[(filtered_data["Status"] != "Paid") & 
+                                 (filtered_data["Status"] != "Refunded") & 
+                                 (filtered_data["Status"] != "Partial Refund")]["Converted Amount"].sum()
     total_disputed_amount = filtered_data["Disputed Amount"].sum()
     total_fee = filtered_data["Fee"].sum()
     total_refunded = filtered_data["Converted Amount Refunded"].sum()
 
-    # Generate pie charts
-    pie_chart_count = generate_pie_chart(filtered_data, "Status", "Success vs Failed vs Refunded (Count)")
-    status_amount = filtered_data.groupby("Status")["Converted Amount"].sum()
-    pie_chart_amount = generate_pie_chart(status_amount.reset_index(), "Status", "Success vs Failed vs Refunded (Amount)")
+    # Count the occurrences of each status
+    status_counts = filtered_data["Status"].value_counts().reset_index()
+    status_counts.columns = ["Status", "count"]  # Rename columns for clarity
+
+    # Generate pie chart for status counts
+    pie_chart_count = generate_pie_chart(status_counts, "Status", "count",None)
+
+    # Sum the "Converted Amount" for each status
+    status_amount = filtered_data.groupby("Status")["Converted Amount"].sum().reset_index()
+    status_amount.columns = ["Status", "Converted Amount"]  # Rename columns for clarity
+
+    # Generate pie chart for status amounts
+    pie_chart_amount = generate_pie_chart(status_amount, "Status", "Converted Amount",None)
 
     # Monthly revenue analysis
     filtered_data["Month"] = pd.to_datetime(filtered_data["Created date"], errors='coerce').dt.to_period("M").astype(str)
     monthly_revenue = filtered_data.groupby("Month")["Converted Amount"].sum().reset_index()
-    revenue_chart = generate_line_chart(monthly_revenue, "Month", "Converted Amount", "Monthly Revenue", {"Month": "Month", "Converted Amount": "Revenue"})
+    revenue_chart = generate_line_chart(monthly_revenue, "Month", "Converted Amount", None, {"Month": "Month", "Converted Amount": "Revenue"})
 
     # Group by Month and aggregate
     monthly_summary = filtered_data.groupby("Month").agg(
         Total_Payments=("Converted Amount", "sum"),
         Total_Refunded=("Converted Amount Refunded", "sum"),
         Total_Successful=("Converted Amount", lambda x: x[filtered_data.loc[x.index, "Status"] == "Paid"].sum()),
-        Total_Failed=("Converted Amount", lambda x: x[(filtered_data.loc[x.index, "Status"] != "Paid") & (filtered_data.loc[x.index, "Status"] != "Refunded") & (filtered_data.loc[x.index, "Status"] != "Partial Refund")].sum())
+        Total_Failed=("Converted Amount", lambda x: x[(filtered_data.loc[x.index, "Status"] != "Paid") & 
+                                                      (filtered_data.loc[x.index, "Status"] != "Refunded") & 
+                                                      (filtered_data.loc[x.index, "Status"] != "Partial Refund")].sum())
     ).reset_index()
 
     graph_data = monthly_summary.drop(columns=["Total_Payments"])
@@ -217,29 +245,12 @@ def overview():
     country_chart = px.bar(country_summary, x="Card Address Country", y="Converted Amount")
 
     # Failed reasons
-    failed_reasons = filtered_data[(filtered_data["Status"] != "Paid") & (filtered_data["Status"] != "Refunded") & (filtered_data["Status"] != "Partial Refund")]["Decline Reason"].value_counts().reset_index()
+    failed_reasons = filtered_data[(filtered_data["Status"] != "Paid") & 
+                                   (filtered_data["Status"] != "Refunded") & 
+                                   (filtered_data["Status"] != "Partial Refund")]["Decline Reason"].value_counts().reset_index()
     failed_reasons.columns = ["Decline Reason", "Count"]
     failed_reason_chart = px.bar(failed_reasons, x="Decline Reason", y="Count")
 
-    cohort_data = {}
-    retention_data = {}
-    cohort_message = None
-    retention_message = None
-
-    cohort_table, retention_table = perform_cohort_analysis(filtered_data)
-
-    # Check if messages are returned instead of tables
-    if isinstance(cohort_table, str) and isinstance(retention_table, str):
-        cohort_message = cohort_table  # Assign the returned message
-        retention_message = retention_table
-    else:
-        cohort_message = None
-        retention_message = None
-        cohort_data = cohort_table.fillna(0).astype(int).to_dict(orient='index')
-        retention_data = retention_table.fillna(0).round(2).to_dict(orient='index')
-
-    # Convert tables to dictionaries for rendering in the template
-   
     return render_template(
         'overview.html',
         total_payment_value=total_payment_value,
@@ -257,15 +268,40 @@ def overview():
         subscription_chart=subscription_chart.to_html(full_html=False),
         country_chart=country_chart.to_html(full_html=False),
         failed_reason_chart=failed_reason_chart.to_html(full_html=False),
-        cohort_data=cohort_data,
-        retention_data=retention_data,
         source_filter=selected_source,
         unique_sources=unique_sources,
-        selected_source=selected_source,
-        cohort_message=cohort_message,
-        retention_message=retention_message,
-
+        selected_source=selected_source
     )
+
+
+@app.route('/cohorts')
+def cohorts():
+
+    cohort_data = {}
+    retention_data = {}
+    cohort_message = None
+    retention_message = None
+
+    cohort_table, retention_table = perform_cohort_analysis(data)
+
+    # Check if messages are returned instead of tables
+    if isinstance(cohort_table, str) and isinstance(retention_table, str):
+        cohort_message = cohort_table  # Assign the returned message
+        retention_message = retention_table
+    else:
+        cohort_message = None
+        retention_message = None
+        cohort_data = cohort_table.fillna(0).astype(int).to_dict(orient='index')
+        retention_data = retention_table.fillna(0).round(2).to_dict(orient='index')
+
+    return render_template(
+        'cohorts.html',
+        cohort_data=cohort_data,
+        retention_data=retention_data,
+        cohort_message=cohort_message,
+        retention_message=retention_message
+    )
+
 
 @app.route('/customer-metrics', methods=['GET', 'POST'])
 def customer_metrics():
@@ -284,12 +320,12 @@ def customer_metrics():
             metrics = {
                 'total_payments': customer_data['Converted Amount'].sum(),
                 'total_successful_payments': customer_data[customer_data['Status'] == 'Paid']['Converted Amount'].sum(),
-                'total_adspend_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Adspends') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum(),
-                'total_subscription_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Subscription') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum(),
+                'total_adspend_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Adspends') & (customer_data['Status'] == 'Paid')].shape[0],
+                'total_subscription_transactions': customer_data[(customer_data['Adspends / Subscription'] == 'Subscription') & (customer_data['Status'] == 'Paid')].shape[0],
                 'total_refunds': customer_data['Converted Amount Refunded'].sum(),
                 'total_disputes': customer_data['Disputed Amount'].sum(),
-                'total_subscription': customer_data[customer_data['Adspends / Subscription'] == 'Subscription']['Converted Amount'].sum(),
-                'total_adspends': customer_data[customer_data['Adspends / Subscription'] == 'Adspends']['Converted Amount'].sum()
+                'total_subscription': customer_data[(customer_data['Adspends / Subscription'] == 'Subscription') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum(),
+                'total_adspends': customer_data[(customer_data['Adspends / Subscription'] == 'Adspends') & (customer_data['Status'] == 'Paid')]['Converted Amount'].sum()
             }
 
             total_rows = customer_data.shape[0]

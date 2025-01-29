@@ -324,36 +324,19 @@ if selected_page == "Overview":
 
 
 # Other Pages
-@app.route('/customer-metrics', methods=['GET', 'POST'])
-def customer_metrics():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        customer_data = get_customer_data(email)  # Replace with your actual data-fetching function
-
-        if customer_data.empty:
-            return render_template('customer-metrics.html', error="No data found for this customer.")
-
-        # Prepare the table as an HTML table using pandas
-        customer_data_html = customer_data.to_html(
-            classes="table table-bordered table-hover table-striped align-middle",
-            index=False,
-            escape=False  # To allow HTML rendering in table
-        )
-
-        # Calculate metrics
-        metrics = {
-            "total_payments": customer_data["Converted Amount"].sum(),
-            "total_refunds": customer_data["Converted Amount Refunded"].sum(),
-            "total_transactions": len(customer_data),
-        }
-
-        return render_template(
-            'customer-metrics.html',
-            metrics=metrics,
-            customer_data=customer_data_html
-        )
-
-    return render_template('customer-metrics.html')
+elif selected_page == "Customer Metrics":
+    st.title("Customer-Level Metrics")
+    email = st.text_input("Enter Customer Email:")
+    if email:
+        customer_data = data[data['Customer Email'] == email]
+        if not customer_data.empty:
+            st.write(f"Metrics for {email}:")
+            st.metric("Total Payments", customer_data['Amount'].sum())
+            st.metric("Total Refunds", customer_data['Amount Refunded'].sum())
+            st.metric("Total Transactions", customer_data.shape[0])
+            st.dataframe(customer_data)
+        else:
+            st.warning("No data found for this email.")
 
 
 elif selected_page == "Transactions":

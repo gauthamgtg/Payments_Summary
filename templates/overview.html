@@ -1,240 +1,165 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Overview</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<link href="/static/styles.css" rel="stylesheet"/>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Overview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/static/styles.css" rel="stylesheet" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 </head>
+
 <body>
-<!-- Navigation Bar -->
-<header class="navbar navbar-expand-lg navbar-dark bg-dark">
-<div class="container-fluid">
-<a class="navbar-brand" href="/">Payments Dashboard</a>
-<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
-<span class="navbar-toggler-icon"></span>
-</button>
-<div class="collapse navbar-collapse" id="navbarNav">
-<ul class="navbar-nav ms-auto">
-<li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-<li class="nav-item"><a class="nav-link active" href="/overview">Overview</a></li>
-<li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
-<li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
-<li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
-<li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
-<li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs Subscriptions</a></li>
-</ul>
-</div>
-</div>
-</header>
-<!-- Main Content -->
-<main class="container my-5">
-<!-- Title -->
-<h1 class="text-center mb-4">Payments Overview</h1>
-<div class="row mb-4">
-    <div class="col-md-6">
-        <label for="sourceFilter" class="form-label">Filter by Source:</label>
-        <select id="sourceFilter" class="form-select">
-            <option value="All" {% if selected_source == "All" %}selected{% endif %}>All</option>
-            {% for source in unique_sources %}
-                <option value="{{ source }}" {% if selected_source == source %}selected{% endif %}>{{ source }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
-<!-- Metrics Section -->
-<div class="row g-4 text-center">
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Payment Value</h5>
-<h3>${{ "{:,.2f}".format(total_payment_value) }}</h3>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Successful Payments</h5>
-<h3>${{ "{:,.2f}".format(total_success) }}</h3>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Failed Payments</h5>
-<h3>${{ "{:,.2f}".format(total_failed) }}</h3>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Disputed Amount</h5>
-<h3>${{ "{:,.2f}".format(total_disputed_amount) }}</h3>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Fee</h5>
-<h3>${{ "{:,.2f}".format(total_fee) }}</h3>
-</div>
-</div>
-<div class="col-md-4">
-<div class="card metric-card p-3">
-<h5>Total Refunded Amount</h5>
-<h3>${{ "{:,.2f}".format(total_refunded) }}</h3>
-</div>
-</div>
-</div>
-<!-- Pie Charts Section -->
-<div class="row mt-5">
-<div class="col-md-6 chart-container">
-<h4 class="text-center">Success vs Failed vs Refunded (Count)</h4>
-<div>{{ pie_chart_count | safe }}</div>
-</div>
-<div class="col-md-6 chart-container">
-<h4 class="text-center">Success vs Failed vs Refunded (Amount)</h4>
-<div>{{ pie_chart_amount | safe }}</div>
-</div>
-</div>
-<!-- Line Chart: Monthly Revenue -->
-<div class="row mt-5">
-<div class="col-12 chart-container">
-<h4 class="text-center">Monthly Revenue</h4>
-<div>{{ revenue_chart | safe }}</div>
-</div>
-</div>
-<!-- Stacked Bar Chart -->
-<div class="row mt-5">
-<div class="col-12 chart-container">
-<h4 class="text-center">Monthly Payment Breakdown (Refunded, Successful, Failed)</h4>
-<div>{{ stacked_bar_chart | safe }}</div>
-</div>
-</div>
-<!-- 100% Stacked Bar Chart -->
-<div class="row mt-5">
-<div class="col-12 chart-container">
-<h4 class="text-center">Monthly Payment Breakdown (100% Stacked)</h4>
-<div>{{ normalized_chart | safe }}</div>
-</div>
-</div>
-<!-- Adspends and Subscriptions -->
-<div class="row mt-5">
-<div class="col-md-6 chart-container">
-<h4 class="text-center">Adspends Monthly Breakdown</h4>
-<div>{{ adspends_chart | safe }}</div>
-</div>
-<div class="col-md-6 chart-container">
-<h4 class="text-center">Subscriptions Monthly Breakdown</h4>
-<div>{{ subscription_chart | safe }}</div>
-</div>
-</div>
-<!-- Payments by Country -->
-<div class="row mt-5">
-<div class="col-12 chart-container">
-<h4 class="text-center">Payments by Card Address Country</h4>
-<div>{{ country_chart | safe }}</div>
-</div>
-</div>
-<!-- Failed Payments Reason Analysis -->
-<div class="row mt-5">
-<div class="col-12 chart-container">
-<h4 class="text-center">Failed Payments Reason Analysis</h4>
-<div>{{ failed_reason_chart | safe }}</div>
-</div>
-</div>
+    <!-- Navigation Bar -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Payments Dashboard</a>
+            <button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/overview">Overview</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/cohorts">Cohorts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customer-metrics">Customer Metrics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/refunds">Refunds</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/disputes">Disputes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/adspends-vs-subscriptions">Adspends vs
+                            Subscriptions</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="container my-5">
+        <!-- Title -->
+        <h1 class="text-center mb-4">Payments Overview</h1>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label for="sourceFilter" class="form-label">Filter by Source:</label>
+                <select id="sourceFilter" class="form-select">
+                    <option value="All" {% if selected_source=="All" %}selected{% endif %}>All</option>
+                    {% for source in unique_sources %}
+                    <option value="{{ source }}" {% if selected_source==source %}selected{% endif %}>{{ source }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <!-- Metrics Section -->
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Payment Value</h5>
+                    <h3>${{ "{:,.2f}".format(total_payment_value) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Successful Payments</h5>
+                    <h3>${{ "{:,.2f}".format(total_success) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Failed Payments</h5>
+                    <h3>${{ "{:,.2f}".format(total_failed) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Disputed Amount</h5>
+                    <h3>${{ "{:,.2f}".format(total_disputed_amount) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Fee</h5>
+                    <h3>${{ "{:,.2f}".format(total_fee) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card metric-card p-3">
+                    <h5>Total Refunded Amount</h5>
+                    <h3>${{ "{:,.2f}".format(total_refunded) }}</h3>
+                </div>
+            </div>
+        </div>
+        <!-- Pie Charts Section -->
+        <div class="row mt-5">
+            <div class="col-md-6 chart-container">
+                <h4 class="text-center">Success vs Failed vs Refunded (Count)</h4>
+                <div>{{ pie_chart_count | safe }}</div>
+            </div>
+            <div class="col-md-6 chart-container">
+                <h4 class="text-center">Success vs Failed vs Refunded (Amount)</h4>
+                <div>{{ pie_chart_amount | safe }}</div>
+            </div>
+        </div>
+        <!-- Line Chart: Monthly Revenue -->
+        <div class="row mt-5">
+            <div class="col-12 chart-container">
+                <h4 class="text-center">Monthly Revenue</h4>
+                <div>{{ revenue_chart | safe }}</div>
+            </div>
+        </div>
+        <!-- Stacked Bar Chart -->
+        <div class="row mt-5">
+            <div class="col-12 chart-container">
+                <h4 class="text-center">Monthly Payment Breakdown (Refunded, Successful, Failed)</h4>
+                <div>{{ stacked_bar_chart | safe }}</div>
+            </div>
+        </div>
+        <!-- 100% Stacked Bar Chart -->
+        <div class="row mt-5">
+            <div class="col-12 chart-container">
+                <h4 class="text-center">Monthly Payment Breakdown (100% Stacked)</h4>
+                <div>{{ normalized_chart | safe }}</div>
+            </div>
+        </div>
+        <!-- Adspends and Subscriptions -->
+        <div class="row mt-5">
+            <div class="col-md-6 chart-container">
+                <h4 class="text-center">Adspends Monthly Breakdown</h4>
+                <div>{{ adspends_chart | safe }}</div>
+            </div>
+            <div class="col-md-6 chart-container">
+                <h4 class="text-center">Subscriptions Monthly Breakdown</h4>
+                <div>{{ subscription_chart | safe }}</div>
+            </div>
+        </div>
+        <!-- Payments by Country -->
+        <div class="row mt-5">
+            <div class="col-12 chart-container">
+                <h4 class="text-center">Payments by Card Address Country</h4>
+                <div>{{ country_chart | safe }}</div>
+            </div>
+        </div>
+        <!-- Failed Payments Reason Analysis -->
+        <div class="row mt-5">
+            <div class="col-12 chart-container">
+                <h4 class="text-center">Failed Payments Reason Analysis</h4>
+                <div>{{ failed_reason_chart | safe }}</div>
+            </div>
+        </div>
 
-<!-- Cohorts -->
-<h2>Customer Cohort Table</h2>
-<div id="cohortContainer">
-    <!-- This div will be replaced dynamically with a message or the table -->
-</div>
 
-<h2>Retention Rate Table</h2>
-<div id="retentionContainer">
-    <!-- This div will be replaced dynamically with a message or the table -->
-</div>
-
-<script>
-    // Data for cohort and retention tables passed from Flask
-    const cohortData = {{ cohort_data | tojson }};
-    const retentionData = {{ retention_data | tojson }};
-
-    // Helper function to calculate color based on value
-    function getColor(value, minValue, maxValue) {
-        if (value === 0) {
-            return "#f0f0f0"; // Light grey for zero values
-        }
-
-        const ratio = (value - minValue) / (maxValue - minValue);
-        const lightness = 90 - ratio * 50; // Ranges from 50% (dark blue) to 100% (light blue)
-
-        return `hsl(240, 100%, ${lightness}%)`;
-    }
-
-    // Function to render a table with row-wise color scaling
-    function renderTable(data, containerId, tableId) {
-        const container = document.getElementById(containerId);
-
-        // Handle empty or invalid data
-        if (!data || Object.keys(data).length === 0) {
-            container.innerHTML = `<p class="text-warning">No data available for this table.</p>`;
-            return;
-        }
-
-        // Create table
-        const table = document.createElement('table');
-        table.id = tableId;
-        table.className = 'table table-bordered table-hover table-striped align-middle';
-
-        const keys = Object.keys(data); // Cohort periods (rows)
-        const periods = Object.keys(data[keys[0]]); // Period numbers (columns)
-
-        // Create table header
-        let headerRow = '<tr><th>Cohort</th>';
-        periods.forEach(period => {
-            headerRow += `<th>Month ${period}</th>`;
-        });
-        headerRow += '</tr>';
-        table.innerHTML += headerRow;
-
-        // Create table body with color scale per row
-        keys.forEach(cohort => {
-            const rowData = data[cohort]; // Data for the current row
-
-            // Calculate min and max values for each row to scale colors per row
-            const rowValues = Object.values(rowData);
-            const minValue = Math.min(...rowValues);
-            const maxValue = Math.max(...rowValues);
-
-            let row = `<tr><td>${cohort}</td>`;
-            periods.forEach(period => {
-                const value = rowData[period] || 0;
-                const color = getColor(value, minValue, maxValue);
-                row += `<td style="background-color: ${color};">${value}</td>`;
+        <!-- Footer -->
+        <footer class="bg-dark text-white text-center py-3">
+            <p>© 2025 Payments Dashboard. All rights reserved.</p>
+        </footer>
+        <script>
+            document.getElementById('sourceFilter').addEventListener('change', function () {
+                const selectedSource = this.value;
+                window.location.href = `/overview?source=${encodeURIComponent(selectedSource)}`;
             });
-            row += '</tr>';
-            table.innerHTML += row;
-        });
-
-        // Append the table to the container
-        container.appendChild(table);
-    }
-
-    // Render cohort and retention tables
-    renderTable(cohortData, 'cohortContainer', 'cohortTable');
-    renderTable(retentionData, 'retentionContainer', 'retentionTable');
-</script>
-
-
-<!-- Footer -->
-<footer class="bg-dark text-white text-center py-3">
-<p>© 2025 Payments Dashboard. All rights reserved.</p>
-</footer>
-<script>
-    document.getElementById('sourceFilter').addEventListener('change', function () {
-        const selectedSource = this.value;
-        window.location.href = `/overview?source=${encodeURIComponent(selectedSource)}`;
-    });
-</script>
+        </script>
 </body>
+
 </html>
